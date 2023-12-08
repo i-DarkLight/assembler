@@ -148,28 +148,28 @@ func getmemoryIR(s string, b bool) byte {
 func saveAddress(index int, line string, org uint) {
 	pos := strings.Index(line, ",")
 	str := line[:pos]
-	mp[str] = ToHex(org + uint(index))
+	mp[str] = toHEX(org + uint(index))
 }
 func addressing(line string, add uint) {
 	pos := strings.Index(line, ",")
 	if test := line[pos+2 : pos+5]; test == "DEC" {
 		d, _ := strconv.ParseInt(line[pos+6:], 10, 64)
 		dec := uint(d)
-		hexConverted = append(hexConverted, ToHex(add)+" "+ToHex(dec))
+		hexConverted = append(hexConverted, toHEX(add)+" "+toHEX(dec))
 	} else if test == "HEX" {
-		hexConverted = append(hexConverted, ToHex(add)+" "+line[pos+6:])
-	} else if isMemory(test) == false {
-		hexConverted = append(hexConverted, ToHex(add)+" "+getIRhex(line[pos+2:pos+5]))
+		hexConverted = append(hexConverted, toHEX(add)+" "+line[pos+6:])
+	} else if !isMemory(test) {
+		hexConverted = append(hexConverted, toHEX(add)+" "+getIRhex(line[pos+2:pos+5]))
 	} else if check := strings.Contains(line, " I"); check && isMemory(test) {
 		posI := strings.Index(line, "I")
-		temp, _ := mp[line[5:posI-1]]
-		hexConverted = append(hexConverted, ToHex(add)+" "+string(getmemoryIR(line[pos+2:pos+5], false))+temp)
-	} else if check := strings.Contains(line, " I"); check == false && isMemory(test) {
-		temp, _ := mp[line[5:]]
-		hexConverted = append(hexConverted, ToHex(add)+" "+string(getmemoryIR(line[pos+2:pos+5], true))+temp)
+		temp:= mp[line[5:posI-1]]
+		hexConverted = append(hexConverted, toHEX(add)+" "+string(getmemoryIR(line[pos+2:pos+5], false))+temp)
+	} else if check := strings.Contains(line, " I"); !check && isMemory(test) {
+		temp:= mp[line[5:]]
+		hexConverted = append(hexConverted, toHEX(add)+" "+string(getmemoryIR(line[pos+2:pos+5], true))+temp)
 	}
 }
-func ToHex(num uint) string {
+func toHEX(num uint) string {
 	var hex []byte
 	for num > 0 {
 		if k := num % 16; k < 10 {
@@ -214,15 +214,15 @@ func Run() {
 			if check := strings.Contains(line, " I "); isMemory(line[1:4]) && check {
 				decimalorg += 1
 				pos := strings.Index(line, "I")
-				temp, _ := mp[line[5:pos-1]]
-				hexConverted = append(hexConverted, ToHex(decimalorg)+" "+string(getmemoryIR(line[1:4], false))+temp)
-			} else if check := strings.Contains(line, " I "); isMemory(line[1:4]) && check == false {
-				temp, _ := mp[line[5:]]
+				temp := mp[line[5:pos-1]]
+				hexConverted = append(hexConverted, toHEX(decimalorg)+" "+string(getmemoryIR(line[1:4], false))+temp)
+			} else if check := strings.Contains(line, " I "); isMemory(line[1:4]) && !check {
+				temp:= mp[line[5:]]
 				decimalorg += 1
-				hexConverted = append(hexConverted, ToHex(decimalorg)+" "+string(getmemoryIR(line[1:4], true))+temp)
+				hexConverted = append(hexConverted, toHEX(decimalorg)+" "+string(getmemoryIR(line[1:4], true))+temp)
 			} else {
 				decimalorg += 1
-				hexConverted = append(hexConverted, ToHex(decimalorg)+" "+getIRhex(line[1:4]))
+				hexConverted = append(hexConverted, toHEX(decimalorg)+" "+getIRhex(line[1:4]))
 			}
 		}
 	}
