@@ -57,7 +57,18 @@ func ToBinary() {
 		}
 		temp = strings.TrimSpace(temp)
 		binaryOfLine := convert(temp)
-		BinaryCode = append(BinaryCode, binaryOfLine[:12]+"		"+binaryOfLine[12:])
+		if short := binaryOfLine[12:]; len(short) == 4 {
+			short = "000000000000" + short
+			BinaryCode = append(BinaryCode, "Bin Address: "+binaryOfLine[:12]+"	Data: "+short)
+		} else if len(short) == 8 {
+			short = "00000000" + short
+			BinaryCode = append(BinaryCode, "Bin Address: "+binaryOfLine[:12]+"	Data: "+short)
+		} else if len(short) == 12 {
+			short = "0000" + short
+			BinaryCode = append(BinaryCode, "Bin Address: "+binaryOfLine[:12]+"	Data: "+short)
+		} else {
+			BinaryCode = append(BinaryCode, "Bin Address: "+binaryOfLine[:12]+"	Data: "+binaryOfLine[12:])
+		}
 	}
 	for _, elem := range BinaryCode {
 		println(elem)

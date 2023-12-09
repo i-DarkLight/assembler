@@ -229,6 +229,6 @@ func Run(lines []string) {
 		}
 	}
 	for _, elem := range HexConverted {
-		println(elem)
+		println("Hex Address: " + elem[:3] + "	Data: " + elem[3:])
 	}
 }
