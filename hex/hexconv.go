@@ -1,14 +1,15 @@
 package hex
+
 import (
-	"bufio"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 )
-var hexConverted []string
+
+var HexConverted []string
 var decimalorg uint
 var mp = make(map[string]string)
+
 func isMemory(s string) bool {
 	memoryIR := []string{"LDA", "STA", "ADD", "AND", "BUN", "BSA"}
 	for _, elem := range memoryIR {
@@ -155,18 +156,18 @@ func addressing(line string, add uint) {
 	if test := line[pos+2 : pos+5]; test == "DEC" {
 		d, _ := strconv.ParseInt(line[pos+6:], 10, 64)
 		dec := uint(d)
-		hexConverted = append(hexConverted, toHEX(add)+" "+toHEX(dec))
+		HexConverted = append(HexConverted, toHEX(add)+"	"+toHEX(dec))
 	} else if test == "HEX" {
-		hexConverted = append(hexConverted, toHEX(add)+" "+line[pos+6:])
+		HexConverted = append(HexConverted, toHEX(add)+"	"+line[pos+6:])
 	} else if !isMemory(test) {
-		hexConverted = append(hexConverted, toHEX(add)+" "+getIRhex(line[pos+2:pos+5]))
+		HexConverted = append(HexConverted, toHEX(add)+"	"+getIRhex(line[pos+2:pos+5]))
 	} else if check := strings.Contains(line, " I"); check && isMemory(test) {
 		posI := strings.Index(line, "I")
-		temp:= mp[line[5:posI-1]]
-		hexConverted = append(hexConverted, toHEX(add)+" "+string(getmemoryIR(line[pos+2:pos+5], false))+temp)
+		temp := mp[line[5:posI-1]]
+		HexConverted = append(HexConverted, toHEX(add)+"	"+string(getmemoryIR(line[pos+2:pos+5], false))+temp)
 	} else if check := strings.Contains(line, " I"); !check && isMemory(test) {
-		temp:= mp[line[5:]]
-		hexConverted = append(hexConverted, toHEX(add)+" "+string(getmemoryIR(line[pos+2:pos+5], true))+temp)
+		temp := mp[line[5:]]
+		HexConverted = append(HexConverted, toHEX(add)+"	"+string(getmemoryIR(line[pos+2:pos+5], true))+temp)
 	}
 }
 func toHEX(num uint) string {
@@ -183,19 +184,16 @@ func toHEX(num uint) string {
 	for i := range hex {
 		hexReturn += string(rune(hex[len(hex)-1-i]))
 	}
+	if len(hexReturn) == 1 {
+		return "00" + hexReturn
+	} else if len(hexReturn) == 2 {
+		return "0" + hexReturn
+	}
 	return hexReturn
 }
-func Run() {
-	input := bufio.NewScanner(os.Stdin)
-	var lines []string
-	for {
-		input.Scan()
-		line := input.Text()
-		if line == "~" {
-			break
-		}
-		lines = append(lines, line)
-	}
+func Run(lines []string) {
+	defer println("===============================")
+
 	for _, line := range lines {
 		if check := strings.Contains(line, "ORG"); check {
 			decimalorg = getDECofHEX(line[5:])
@@ -215,18 +213,18 @@ func Run() {
 				decimalorg += 1
 				pos := strings.Index(line, "I")
 				temp := mp[line[5:pos-1]]
-				hexConverted = append(hexConverted, toHEX(decimalorg)+" "+string(getmemoryIR(line[1:4], false))+temp)
+				HexConverted = append(HexConverted, toHEX(decimalorg)+"		"+string(getmemoryIR(line[1:4], false))+temp)
 			} else if check := strings.Contains(line, " I "); isMemory(line[1:4]) && !check {
-				temp:= mp[line[5:]]
+				temp := mp[line[5:]]
 				decimalorg += 1
-				hexConverted = append(hexConverted, toHEX(decimalorg)+" "+string(getmemoryIR(line[1:4], true))+temp)
+				HexConverted = append(HexConverted, toHEX(decimalorg)+"		"+string(getmemoryIR(line[1:4], true))+temp)
 			} else {
 				decimalorg += 1
-				hexConverted = append(hexConverted, toHEX(decimalorg)+" "+getIRhex(line[1:4]))
+				HexConverted = append(HexConverted, toHEX(decimalorg)+"		"+getIRhex(line[1:4]))
 			}
 		}
 	}
-	for _, elem := range hexConverted {
+	for _, elem := range HexConverted {
 		println(elem)
 	}
 }
