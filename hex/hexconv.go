@@ -156,7 +156,12 @@ func addressing(line string, add uint) {
 	if test := line[pos+2 : pos+5]; test == "DEC" {
 		d, _ := strconv.ParseInt(line[pos+6:], 10, 64)
 		dec := uint(d)
-		HexConverted = append(HexConverted, toHEX(add)+"	"+toHEX(dec))
+		neg := toHEX(dec)
+		if d < 0 {
+			HexConverted = append(HexConverted, toHEX(add)+"	"+neg[len(neg)-4:])
+		} else {
+			HexConverted = append(HexConverted, toHEX(add)+"	"+toHEX(dec))
+		}
 	} else if test == "HEX" {
 		HexConverted = append(HexConverted, toHEX(add)+"	"+line[pos+6:])
 	} else if !isMemory(test) {
@@ -193,7 +198,6 @@ func toHEX(num uint) string {
 }
 func Run(lines []string) {
 	defer println("===============================")
-
 	for _, line := range lines {
 		if check := strings.Contains(line, "ORG"); check {
 			decimalorg = getDECofHEX(line[5:])
@@ -209,18 +213,18 @@ func Run(lines []string) {
 			decimalorg += 1
 			addressing(line, decimalorg)
 		} else {
-			if check := strings.Contains(line, " I "); isMemory(line[1:4]) && check {
+			if check := strings.Contains(line, " I"); isMemory(line[1:4]) && check {
 				decimalorg += 1
 				pos := strings.Index(line, "I")
 				temp := mp[line[5:pos-1]]
-				HexConverted = append(HexConverted, toHEX(decimalorg)+"		"+string(getmemoryIR(line[1:4], false))+temp)
-			} else if check := strings.Contains(line, " I "); isMemory(line[1:4]) && !check {
+				HexConverted = append(HexConverted, toHEX(decimalorg)+"	"+string(getmemoryIR(line[1:4], false))+temp)
+			} else if check := strings.Contains(line, " I"); isMemory(line[1:4]) && !check {
 				temp := mp[line[5:]]
 				decimalorg += 1
-				HexConverted = append(HexConverted, toHEX(decimalorg)+"		"+string(getmemoryIR(line[1:4], true))+temp)
+				HexConverted = append(HexConverted, toHEX(decimalorg)+"	"+string(getmemoryIR(line[1:4], true))+temp)
 			} else {
 				decimalorg += 1
-				HexConverted = append(HexConverted, toHEX(decimalorg)+"		"+getIRhex(line[1:4]))
+				HexConverted = append(HexConverted, toHEX(decimalorg)+"	"+getIRhex(line[1:4]))
 			}
 		}
 	}

@@ -1,8 +1,9 @@
 package binary
 
 import (
-	"github.com/i-DarkLight/memari/hex"
 	"strings"
+
+	"github.com/i-DarkLight/memari/hex"
 )
 
 var BinaryCode []string

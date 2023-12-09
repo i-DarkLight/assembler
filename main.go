@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-
 	"github.com/i-DarkLight/memari/binary"
 	"github.com/i-DarkLight/memari/hex"
 )
